@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option go_package= "github.com/zhuangqi/biubiu/pkg/server/proto/account";
+
+package account.user;
+
+import "google/api/annotations.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+
+service userService {
+  rpc CreateUser (CreateUserRequest) returns (CreateUserReply) {
+    option (google.api.http) = {
+      post: "/v1/sysuser"
+      body: "*"
+    };
+  }
+}
+
+
+message CreateUserRequest {
+  string username = 1 [(validator.field) = {string_not_empty : true}];
+  string password = 2 [(validator.field) = {string_not_empty : true}];
+}
+
+message CreateUserReply {
+  int64  id       = 1 [(validator.field) = {string_not_empty : true}];
+  string username = 2 [(validator.field) = {string_not_empty : true}];
+}

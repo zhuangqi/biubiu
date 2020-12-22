@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package= "github.com/zhuangqi/biubiu/pkg/server/proto/auth";
+
+package auth;
+
+import "google/api/annotations.proto";
+import "github.com/mwitkow/go-proto-validators/validator.proto";
+
+service authService {
+  rpc Login(LoginRequest) returns (LoginReply) {
+    option (google.api.http) = {
+      post: "/v1/auth/login"
+      body: "*"
+    };
+  };
+}
+
+message LoginRequest {
+  string username = 1 [(validator.field) = {string_not_empty : true}];
+  string password = 2 [(validator.field) = {string_not_empty : true}];
+}
+
+message LoginReply {
+  int64 id        = 1;
+  string username = 2 [(validator.field) = {string_not_empty : true}];
+  string token    = 3 [(validator.field) = {string_not_empty : true}];
+}
