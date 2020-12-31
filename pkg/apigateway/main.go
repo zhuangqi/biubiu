@@ -15,19 +15,23 @@ func Serve() {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	// grpc服务地址
-	mux := runtime.NewServeMux()
+	// grpc服务注册
+	gwmux := runtime.NewServeMux()
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	// HTTP转grpc
-	err := account.RegisterUserServiceHandlerFromEndpoint(ctx, mux, "127.0.0.1:9101", opts)
+	err := account.RegisterUserServiceHandlerFromEndpoint(ctx, gwmux, "127.0.0.1:9101", opts)
 	if err != nil {
 		grpclog.Fatalf("Register handler err:%v\n", err)
 	}
-	err = auth.RegisterAuthServiceHandlerFromEndpoint(ctx, mux, "127.0.0.1:9002", opts)
+	err = auth.RegisterAuthServiceHandlerFromEndpoint(ctx, gwmux, "127.0.0.1:9002", opts)
 	if err != nil {
 		grpclog.Fatalf("Register handler err:%v\n", err)
 	}
+
+	// http服务
+	mux := http.NewServeMux()
+	mux.Handle("/", gwmux)
 	grpclog.Info("HTTP Listen on 8080")
 	_ = http.ListenAndServe(":8081", mux)
 }
